@@ -50,7 +50,7 @@ const App = () => {
             width: "100%",
           }}
         >
-          <Title style={{ color: "white" }}>PeopleAI</Title>
+          <Title style={{ color: "white" }}>ChatAI</Title>
         </Header>
         <Content style={{ width: "80%", margin: "auto" }}>
           <br />
