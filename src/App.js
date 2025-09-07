@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ChatComponent from "./components/ChatComponent";
 import RenderQA from "./components/RenderQA";
 import { Layout, Typography } from "antd"; // antd: component library
+import axios from "axios"; // Import axios for API calls
 
 const chatComponentStyle = {
   position: "fixed",
@@ -18,20 +19,41 @@ const renderQAStyle = {
 };
 
 const App = () => {
-  const [conversation, setConversation] = useState([]); //useState() change varibles' state to interact, inside () is initial state
+  // store the conversation as an array of message objects from the DB
+  const [conversation, setConversation] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const { Header, Content } = Layout;
   const { Title } = Typography;
 
-  const handleResp = (question, answer) => {
-    setConversation((prev) =>
-      prev.map((entry) =>
-        entry.question === question ? { ...entry, answer } : entry
-      )
-    );
-  };
-  const addQuestion = (question) => {
-    setConversation((prev) => [...prev, { question, answer: null }]);
+  // Function to send a new message to the backend
+  const handleNewMessage = async (question) => {
+    setIsLoading(true);
+
+    setConversation((prev) => [...prev, { sender: "user", message: question }]);
+
+    try {
+      // Send the new question to the backend. The backend handles saving the user's message
+      // and getting the AI response, saving both to the database.
+      const response = await axios.get(
+        `http://localhost:5001/chat?question=${question}`
+      );
+      // Add the bot's response to the conversation state
+      setConversation((prev) => [
+        ...prev,
+        { sender: "bot", message: response.data.message },
+      ]);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setConversation((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          message: "Sorry, I am unable to respond at this time.",
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -63,8 +85,7 @@ const App = () => {
         </Content>
         <div style={chatComponentStyle}>
           <ChatComponent
-            handleResp={handleResp}
-            addQuestion={addQuestion}
+            handleNewMessage={handleNewMessage}
             isLoading={isLoading}
             setIsLoading={setIsLoading}
           />

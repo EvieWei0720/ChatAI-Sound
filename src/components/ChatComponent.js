@@ -12,30 +12,14 @@ const searchContainer = {
 };
 
 const ChatComponent = (props) => {
-  const { handleResp, addQuestion, isLoading, setIsLoading } = props;
+  const { handleNewMessage, isLoading, setIsLoading } = props;
   const [searchValue, setSearchValue] = useState("");
 
   const onSearch = async (question) => {
     if (!question.trim()) return; //prevent empty question
     setSearchValue("");
     setIsLoading(true);
-    addQuestion(question);
-
-    try {
-      //API call
-      const response = await axios.get(`${DOMAIN}/chat`, {
-        params: { question },
-      });
-      handleResp(question, response.data);
-    } catch (error) {
-      console.error("Error fetching chat response:", error);
-      handleResp(
-        question,
-        "Sorry, there was an error processing your request."
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    handleNewMessage(question);
   };
 
   const handleChange = (e) => {

@@ -21,9 +21,9 @@ const tts = async (text) => {
 
   const responseData = await res.json();
 
-  //const decodedAudioData = Buffer.from(responseData.audio_data, "base64"); // convert to base64 format for audio data
+  const decodedAudioData = Buffer.from(responseData.audio_data, "base64"); // convert to base64 format for audio data
 
-  return responseData;
+  return decodedAudioData;
 };
 
 export default tts;
